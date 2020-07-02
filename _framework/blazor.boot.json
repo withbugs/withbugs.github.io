@@ -1,5 +1,5 @@
 {
-  "cacheBootResources": true,
+  "cacheBootResources": false,
   "config": [ ],
   "debugBuild": false,
   "entryAssembly": "WithBugs.WebSite.Www",
@@ -69,7 +69,7 @@
     },
     "satelliteResources": {
       "ja": {
-        "ja\/WithBugs.WebSite.Www.resources.dll": "sha256-77qeR30PFAru\/ktD3Q0iAXGuDzw6Kf6InKr1xpZpQHI="
+        "ja\/WithBugs.WebSite.Www.resources.dll": "sha256-4WLEsqZ\/NMeuVKMH5IOskrQX1GgZjb0Ttsybi6R5zps="
       }
     }
   }
