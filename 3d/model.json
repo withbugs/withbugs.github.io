@@ -6,7 +6,7 @@
 	},
 	"geometries": [
 		{
-			"uuid": "02D24FE5-C47D-4665-8798-A7E42452E593",
+			"uuid": "D1F3DF9E-0AD7-4190-9835-CDE2B811A9AE",
 			"type": "BufferGeometry",
 			"data": {
 				"attributes": {
@@ -40,7 +40,7 @@
 			}
 		},
 		{
-			"uuid": "EB41AB82-0966-4815-96B2-D2FCF5C4A493",
+			"uuid": "6162987C-18CB-465E-8FD8-614513C97F91",
 			"type": "BufferGeometry",
 			"data": {
 				"attributes": {
@@ -74,7 +74,7 @@
 			}
 		},
 		{
-			"uuid": "4E0C4E48-AB5A-4C8D-81C9-4065901425A0",
+			"uuid": "7689466F-DFD2-4B91-8073-275EF14D4337",
 			"type": "BufferGeometry",
 			"data": {
 				"attributes": {
@@ -109,12 +109,62 @@
 		}],
 	"materials": [
 		{
-			"uuid": "51EEF839-415E-45AB-A854-BD869EF83762",
-			"type": "MeshStandardMaterial",
-			"color": 16777215,
-			"roughness": 1,
-			"metalness": 1,
-			"emissive": 0,
+			"uuid": "423C2148-6510-484D-BBF6-3A788738E171",
+			"type": "MeshPhysicalMaterial",
+			"name": "MatTwitter",
+			"color": 35276,
+			"roughness": 0.5,
+			"metalness": 0,
+			"emissive": 35276,
+			"clearcoat": 0,
+			"clearcoatRoughness": 0,
+			"side": 2,
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"stencilWrite": false,
+			"stencilWriteMask": 255,
+			"stencilFunc": 519,
+			"stencilRef": 0,
+			"stencilFuncMask": 255,
+			"stencilFail": 7680,
+			"stencilZFail": 7680,
+			"stencilZPass": 7680
+		},
+		{
+			"uuid": "254BB215-FD61-4FD7-AE10-73F5E8C47856",
+			"type": "MeshPhysicalMaterial",
+			"name": "MatYouTube",
+			"color": 13372161,
+			"roughness": 0.5,
+			"metalness": 0,
+			"emissive": 13372161,
+			"clearcoat": 0,
+			"clearcoatRoughness": 0,
+			"side": 2,
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"stencilWrite": false,
+			"stencilWriteMask": 255,
+			"stencilFunc": 519,
+			"stencilRef": 0,
+			"stencilFuncMask": 255,
+			"stencilFail": 7680,
+			"stencilZFail": 7680,
+			"stencilZPass": 7680
+		},
+		{
+			"uuid": "DD67D84D-1C99-4E95-B037-FC4062219F64",
+			"type": "MeshPhysicalMaterial",
+			"name": "MatInstagram",
+			"color": 7143628,
+			"roughness": 0.5,
+			"metalness": 0,
+			"emissive": 7143628,
+			"clearcoat": 0,
+			"clearcoatRoughness": 0,
+			"side": 2,
 			"depthFunc": 3,
 			"depthTest": true,
 			"depthWrite": true,
@@ -128,24 +178,14 @@
 			"stencilZPass": 7680
 		}],
 	"object": {
-		"uuid": "8D1A7075-4034-418A-B75C-F3A333EB03B3",
+		"uuid": "EC2BC84B-C767-4FB5-84BA-0EFC84A3F88B",
 		"type": "Group",
 		"name": "untitled.glb",
 		"layers": 1,
-		"matrix": [-1,0,0,0,0,1,0,0,0,0,-1,0,0,0,-2,1],
+		"matrix": [-1,0,0,0,0,1,0,0,0,0,-1,0,0,0,0,1],
 		"children": [
 			{
-				"uuid": "39817B58-66F0-4BCB-8344-C8F11EEBC1B5",
-				"type": "Object3D",
-				"name": "Empty",
-				"userData": {
-					"name": "Empty"
-				},
-				"layers": 1,
-				"matrix": [0.162,0,0,0,0,0,0.162,0,0,-0.162,0,0,0,0.490424,0,1]
-			},
-			{
-				"uuid": "D332F72D-35B9-4602-8C0D-D2A9AAB1F87E",
+				"uuid": "C47E2046-34A4-4538-80A8-245E92032CAF",
 				"type": "Mesh",
 				"name": "Twitter",
 				"userData": {
@@ -153,11 +193,11 @@
 				},
 				"layers": 1,
 				"matrix": [1.5,0,0,0,0,1.5,0,0,0,0,1.5,0,-1.988185,-0.011561,-0.016667,1],
-				"geometry": "02D24FE5-C47D-4665-8798-A7E42452E593",
-				"material": "51EEF839-415E-45AB-A854-BD869EF83762"
+				"geometry": "D1F3DF9E-0AD7-4190-9835-CDE2B811A9AE",
+				"material": "423C2148-6510-484D-BBF6-3A788738E171"
 			},
 			{
-				"uuid": "6B4BCA62-AB41-43CA-AEFD-CD5FA5F55447",
+				"uuid": "2C3D9367-B5D1-4712-9418-EA1F602961BD",
 				"type": "Mesh",
 				"name": "YouTube",
 				"userData": {
@@ -165,11 +205,11 @@
 				},
 				"layers": 1,
 				"matrix": [0.72723,0,0,0,0,0,0.75,0,0,-0.507016,0,0,0.032942,0.686106,0.058333,1],
-				"geometry": "EB41AB82-0966-4815-96B2-D2FCF5C4A493",
-				"material": "51EEF839-415E-45AB-A854-BD869EF83762"
+				"geometry": "6162987C-18CB-465E-8FD8-614513C97F91",
+				"material": "254BB215-FD61-4FD7-AE10-73F5E8C47856"
 			},
 			{
-				"uuid": "4FFFA8B0-342F-4C1C-B2BA-3EB0457B080E",
+				"uuid": "439A5E83-5324-4914-A90B-6D42D2A2D03F",
 				"type": "Mesh",
 				"name": "Instagram",
 				"userData": {
@@ -177,8 +217,8 @@
 				},
 				"layers": 1,
 				"matrix": [1.5,0,0,0,0,1.5,0,0,0,0,1.5,0,1.924237,-0.047157,0.058333,1],
-				"geometry": "4E0C4E48-AB5A-4C8D-81C9-4065901425A0",
-				"material": "51EEF839-415E-45AB-A854-BD869EF83762"
+				"geometry": "7689466F-DFD2-4B91-8073-275EF14D4337",
+				"material": "DD67D84D-1C99-4E95-B037-FC4062219F64"
 			}]
 	}
 }
