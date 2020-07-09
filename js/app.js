@@ -89,6 +89,9 @@ window.appJsFunctions = {
                     case 'Instagram':
                         url = 'https://www.instagram.com/withbugs/';
                         break;
+                    case 'GitHub':
+                        url = 'https://github.com/withbugs';
+                        break;
                 }
 
                 if (url) {
