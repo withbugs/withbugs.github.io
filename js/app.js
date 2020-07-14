@@ -2,9 +2,23 @@
 import { OrbitControls } from '/js/threejs/controls/OrbitControls.js';
 import { RoomEnvironment } from '/js/threejs/environments/RoomEnvironment.js';
 
+var stopAnimation;
+var resizeHandler;
+
 window.appJsFunctions = {
 
+    cleanup: function () {
+        stopAnimation = true;
+
+        // invoking an event which has references to disposed object(s) looks start GC process.
+        if (resizeHandler) {
+            // not calling directly but using setTimeout ensures object(s) disposed.
+            window.setTimeout(resizeHandler);
+        }
+    },
+
     loadScene: function () {
+
         var container = document.getElementById('index-3d-viewer');
         if (!container) {
             console.log('no container element found.');
@@ -103,20 +117,43 @@ window.appJsFunctions = {
         container.addEventListener('click', handler);
         container.addEventListener('touchend', handler);
         
+        stopAnimation = false;
 
         var animate = function () {
+            if (stopAnimation) {
+                console.log('stopping animation');
+                return;
+            }
+
             requestAnimationFrame(animate);
             renderer.render(scene, camera);
         };
 
-        window.addEventListener('resize', () => {
+        // resize event handler is added each time 'loadScene' function is called.
+        // to avoid keep adding handlers, remove a handler when referencing disposed object like 'container.clientWidth'.
+        // and have a handler reference as 'resizeHandler' to call in cleanup function to remove a handler and kick GC process.
+        var f;
+
+        window.addEventListener('resize', f = () => {
+
+            //console.log('resized');
+
             var newWidth = container.clientWidth;
             var newHeight = container.clientHeight;
 
             camera.aspect = newWidth / newHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(newWidth, newHeight);
+
+            //console.log(newWidth);
+            if (newWidth == 0) {
+                window.removeEventListener('resize', f);
+                console.log('event removed');
+                return;
+            }
         });
+
+        resizeHandler = f;
 
         animate();
     }

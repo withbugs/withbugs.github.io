@@ -6,7 +6,7 @@
   "linkerEnabled": false,
   "resources": {
     "assembly": {
-      "WithBugs.WebSite.Www.dll": "sha256-D9TskWgfnRGqUmcnNZm5AY9wDYV6uBp+C3V4lLF1gIo=",
+      "WithBugs.WebSite.Www.dll": "sha256-mflAKL2ctHtxnEYlRqMusfYF7Vfx6yU\/uUAzhf\/v4kA=",
       "Microsoft.Extensions.DependencyInjection.Abstractions.dll": "sha256-SIrX0gUuSJrdu4bz6saALUpif6BJVYDRtD6LeGyJxGY=",
       "netstandard.dll": "sha256-\/zcPVM75OAY+joGVM8yIC1gO1SFYWP1CFERgQ8PJkfA=",
       "System.Xml.Linq.dll": "sha256-IPbQMdJxZXdk8HTlaPyXdQ6Zb82iZLphnM74yO4EURQ=",
@@ -68,7 +68,7 @@
     },
     "satelliteResources": {
       "ja": {
-        "ja\/WithBugs.WebSite.Www.resources.dll": "sha256-pmq+k3OLKI\/VaSlXYfSrOJo5BihNYQw2o757accNSxA="
+        "ja\/WithBugs.WebSite.Www.resources.dll": "sha256-IF6ccSPcJ6WQOnHZf1BwDuO8gI0QI6W\/36bEYCze3RU="
       }
     }
   }
