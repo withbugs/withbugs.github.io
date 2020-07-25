@@ -35,11 +35,10 @@ window.appJsFunctions = {
         container.appendChild(renderer.domElement);
 
         var camera = new THREE.PerspectiveCamera(40, viewerWidth / viewerHeight, 0.1, 100);
+        camera.position.set(1, 1, -4);
 
-        if (viewerWidth > viewerHeight) {
-            camera.position.set(1, 1, -4);
-        } else {
-            camera.position.set(1, 1, -4*3);      
+        if (viewerWidth < viewerHeight) {
+            camera.position.set(1, 1, -12);
         }
 
         var controls = new OrbitControls(camera, container);
