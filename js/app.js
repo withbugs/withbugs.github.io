@@ -110,6 +110,9 @@ window.appJsFunctions = {
                     case 'GitHub':
                         url = 'https://github.com/withbugs';
                         break;
+                    case 'Bot':
+                        url = 'http://withbugsbot.azurewebsites.net/';
+                        break;
                 }
 
                 if (url) {
