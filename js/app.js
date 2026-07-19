@@ -197,6 +197,130 @@ function addPastureEnvironment(scene) {
     });
 }
 
+function createTrackedTextTexture(text) {
+    var canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 192;
+
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '84px Georgia, "Times New Roman", serif';
+    ctx.textBaseline = 'middle';
+
+    var tracking = 48;
+    var widths = [];
+    var textWidth = 0;
+
+    for (var i = 0; i < text.length; i++) {
+        var width = ctx.measureText(text[i]).width;
+        widths.push(width);
+        textWidth += width;
+    }
+
+    textWidth += tracking * Math.max(0, text.length - 1);
+
+    var x = (canvas.width - textWidth) / 2;
+    for (var j = 0; j < text.length; j++) {
+        ctx.fillText(text[j], x, canvas.height / 2);
+        x += widths[j] + tracking;
+    }
+
+    var texture = new THREE.CanvasTexture(canvas);
+    texture.encoding = THREE.sRGBEncoding;
+    texture.anisotropy = 4;
+    return texture;
+}
+
+function createKotatsuLogo(model) {
+    var tabletopSize = 0.82;
+    var tabletopThickness = 0.07;
+    var tabletopHeight = 0.38;
+    var tabletopGeometry = new THREE.BoxBufferGeometry(
+        tabletopSize,
+        tabletopThickness,
+        tabletopSize
+    );
+    var tabletopMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0x1a1a1a,
+        roughness: 0.32,
+        metalness: 0.06,
+        clearcoat: 0.48,
+        clearcoatRoughness: 0.26
+    });
+    var edgeMaterial = new THREE.LineBasicMaterial({
+        color: 0x777777,
+        transparent: true,
+        opacity: 0.28
+    });
+    var legMaterial = new THREE.MeshStandardMaterial({
+        color: 0x1a1a1a,
+        roughness: 0.52,
+        metalness: 0.04
+    });
+
+    var logo = new THREE.Group();
+    logo.name = 'Kotatsu';
+    logo.userData.clickName = 'Kotatsu';
+
+    var youtube = model.getObjectByName('YouTube');
+    var youtubeCenter = new THREE.Vector3(0.03, 0.68, 0);
+    if (youtube && youtube.geometry) {
+        youtube.geometry.computeBoundingBox();
+        youtubeCenter.copy(youtube.geometry.boundingBox.getCenter(new THREE.Vector3()));
+        youtubeCenter.applyMatrix4(youtube.matrix);
+    }
+    logo.position.set(youtubeCenter.x, -0.03, youtubeCenter.z + 1.45);
+
+    var table = new THREE.Group();
+    table.rotation.y = -Math.PI / 4;
+    logo.add(table);
+
+    function addLeg(x, z) {
+        var leg = new THREE.Mesh(
+            new THREE.BoxBufferGeometry(0.045, 0.345, 0.045),
+            legMaterial
+        );
+        leg.position.set(x, 0.1725, z);
+        table.add(leg);
+    }
+
+    addLeg(-0.28, -0.28);
+    addLeg(0.28, -0.28);
+    addLeg(-0.28, 0.28);
+    addLeg(0.28, 0.28);
+
+    var tabletop = new THREE.Mesh(tabletopGeometry, tabletopMaterial);
+    tabletop.position.y = tabletopHeight;
+    table.add(tabletop);
+
+    var tabletopOutline = new THREE.LineSegments(
+        new THREE.EdgesGeometry(tabletopGeometry, 24),
+        edgeMaterial
+    );
+    tabletopOutline.position.copy(tabletop.position);
+    table.add(tabletopOutline);
+
+    var text = new THREE.Mesh(
+        new THREE.PlaneBufferGeometry(0.62, 0.1),
+        new THREE.MeshBasicMaterial({
+            map: createTrackedTextTexture('KOTATSU'),
+            transparent: true,
+            depthWrite: false,
+            side: THREE.DoubleSide
+        })
+    );
+    text.rotation.x = -Math.PI / 2;
+    text.position.y = tabletopHeight + tabletopThickness / 2 + 0.004;
+
+    var textAlongDiagonal = new THREE.Group();
+    textAlongDiagonal.rotation.y = Math.PI / 4;
+    textAlongDiagonal.add(text);
+    table.add(textAlongDiagonal);
+
+    return logo;
+}
+
 function clamp01(value) {
     return Math.min(1, Math.max(0, value));
 }
@@ -359,6 +483,7 @@ function createXLogoMesh(sourceMesh) {
     logo.userData.clickName = 'X';
     logo.visible = false;
     logo.position.copy(sourceMesh.position);
+    logo.position.x += 0.14;
     logo.quaternion.copy(sourceMesh.quaternion);
     logo.scale.copy(sourceMesh.scale);
 
@@ -576,10 +701,10 @@ window.appJsFunctions = {
         container.appendChild(renderer.domElement);
 
         var camera = new THREE.PerspectiveCamera(40, viewerWidth / viewerHeight, 0.1, 100);
-        camera.position.set(1, 1, -4);
+        camera.position.set(1, 1, -5.2);
 
         if (viewerWidth < viewerHeight) {
-            camera.position.set(1, 1, -12);
+            camera.position.set(1, 1, -13.5);
         }
 
         var controls = new OrbitControls(camera, container);
@@ -601,6 +726,7 @@ window.appJsFunctions = {
         var loader = new THREE.ObjectLoader();
         loader.load("/3d/model.json", function (object) {
             model = object;
+            model.add(createKotatsuLogo(model));
             scene.add(model);
             twitterRebrandTransition = createTwitterRebrandTransition(model);
         });
@@ -661,6 +787,9 @@ window.appJsFunctions = {
                         break;
                     case 'Instagram':
                         url = 'https://www.instagram.com/withbugs/';
+                        break;
+                    case 'Kotatsu':
+                        url = 'https://withbugs.github.io/kotatsu/';
                         break;
                     case 'GitHub':
                         url = 'https://github.com/withbugs';
