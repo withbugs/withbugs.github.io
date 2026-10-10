@@ -131,10 +131,13 @@ export function addPublicSiteLogos(model) {
     var fashionPosition = originalLogoCenter(model, 'Bot', [1.26, 0.73, -2.12]);
     fashionPosition.y = 0.73;
     var positions = [fashionPosition];
+    var frontCenter = originalLogoCenter(model, 'YouTube', [0.024, 0.68, 0]);
+    var rowSpacing = frontCenter.z - fashionPosition.z;
+    var rearDepth = fashionPosition.z - rowSpacing;
     // Align the three remaining sites with the actual centers of the front row.
     [['Twitter', -1.984], ['YouTube', 0.024], ['Instagram', 1.93]].forEach(function (column) {
         var center = originalLogoCenter(model, column[0], [column[1], 0.73, 0]);
-        positions.push(new THREE.Vector3(center.x, 0.73, -5.8));
+        positions.push(new THREE.Vector3(center.x, 0.73, rearDepth));
     });
     // Retire the unavailable Bot before the imported model enters the scene.
     var bot = model.getObjectByName('Bot');

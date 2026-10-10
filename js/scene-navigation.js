@@ -63,14 +63,11 @@ export function createSceneNavigation(container, canvas, camera) {
     }
     function initialView() {
         var halfFov = THREE.MathUtils.degToRad(camera.fov / 2);
-        // Start at the closer view chosen during the local review. The rear
-        // row is farther away, so portrait framing can account for that depth.
-        var distance = Math.max(8.1, 4.95 / (Math.tan(halfFov) * camera.aspect) - 5.1);
-        // The imported logos face negative Z; positive X is the viewer's left.
-        camera.position.set(distance * 0.32, distance * 0.60, -distance * 0.9474);
-        camera.lookAt(0, 0.65, 0.7);
-        camera.zoom = 1.2;
-        camera.updateProjectionMatrix();
+        // Keep the frontal review angle and fit the front logos to the width. The rear
+        // row remains behind them, so narrow screens can start closer.
+        var distance = Math.max(3.5, 2.6 / (Math.tan(halfFov) * camera.aspect));
+        camera.position.set(0, distance * 0.54, -distance);
+        camera.lookAt(0, 0.4, -0.1);
         camera.rotation.order = 'YXZ';
         camera.getWorldDirection(forward);
         yaw = Math.atan2(-forward.x, -forward.z);
