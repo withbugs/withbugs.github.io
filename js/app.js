@@ -1,9 +1,8 @@
-﻿import * as THREE from '/js/threejs/three.module.js';
-import { OrbitControls } from '/js/threejs/controls/OrbitControls.js';
+import * as THREE from '/js/threejs/three.module.js';
 import { RoomEnvironment } from '/js/threejs/environments/RoomEnvironment.js';
+import { PUBLIC_SITES, addPublicSiteLogos } from './public-sites.js';
+import { createSceneNavigation } from './scene-navigation.js';
 
-var stopAnimation;
-var resizeHandler;
 
 function createSkyTexture() {
     var canvas = document.createElement('canvas');
@@ -26,7 +25,7 @@ function createSkyTexture() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     var texture = new THREE.CanvasTexture(canvas);
-    texture.encoding = THREE.sRGBEncoding;
+    texture.colorSpace = THREE.SRGBColorSpace;
     texture.anisotropy = 4;
     return texture;
 }
@@ -61,7 +60,7 @@ function createGrassTexture() {
     ctx.globalAlpha = 1;
 
     var texture = new THREE.CanvasTexture(canvas);
-    texture.encoding = THREE.sRGBEncoding;
+    texture.colorSpace = THREE.SRGBColorSpace;
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(7, 7);
@@ -106,7 +105,7 @@ function createHillTexture(colors, ridgeOffset) {
     ctx.globalAlpha = 1;
 
     var texture = new THREE.CanvasTexture(canvas);
-    texture.encoding = THREE.sRGBEncoding;
+    texture.colorSpace = THREE.SRGBColorSpace;
     texture.anisotropy = 4;
     return texture;
 }
@@ -135,14 +134,14 @@ function createCloudTexture() {
     puff(224, 78, 96, 42, 0.5);
 
     var texture = new THREE.CanvasTexture(canvas);
-    texture.encoding = THREE.sRGBEncoding;
+    texture.colorSpace = THREE.SRGBColorSpace;
     texture.anisotropy = 4;
     return texture;
 }
 
 function addPastureEnvironment(scene) {
     var sky = new THREE.Mesh(
-        new THREE.SphereBufferGeometry(45, 48, 24),
+        new THREE.SphereGeometry(45, 48, 24),
         new THREE.MeshBasicMaterial({
             map: createSkyTexture(),
             side: THREE.BackSide,
@@ -153,7 +152,7 @@ function addPastureEnvironment(scene) {
     scene.add(sky);
 
     var ground = new THREE.Mesh(
-        new THREE.PlaneBufferGeometry(90, 90, 1, 1),
+        new THREE.PlaneGeometry(90, 90, 1, 1),
         new THREE.MeshBasicMaterial({
             map: createGrassTexture()
         })
@@ -164,7 +163,7 @@ function addPastureEnvironment(scene) {
 
     function addHill(z, y, scale, texture) {
         var hill = new THREE.Mesh(
-            new THREE.PlaneBufferGeometry(44 * scale, 14 * scale, 1, 1),
+            new THREE.PlaneGeometry(44 * scale, 14 * scale, 1, 1),
             new THREE.MeshBasicMaterial({
                 map: texture,
                 transparent: true,
@@ -227,7 +226,7 @@ function createTrackedTextTexture(text) {
     }
 
     var texture = new THREE.CanvasTexture(canvas);
-    texture.encoding = THREE.sRGBEncoding;
+    texture.colorSpace = THREE.SRGBColorSpace;
     texture.anisotropy = 4;
     return texture;
 }
@@ -236,7 +235,7 @@ function createKotatsuLogo(model) {
     var tabletopSize = 0.82;
     var tabletopThickness = 0.07;
     var tabletopHeight = 0.38;
-    var tabletopGeometry = new THREE.BoxBufferGeometry(
+    var tabletopGeometry = new THREE.BoxGeometry(
         tabletopSize,
         tabletopThickness,
         tabletopSize
@@ -278,7 +277,7 @@ function createKotatsuLogo(model) {
 
     function addLeg(x, z) {
         var leg = new THREE.Mesh(
-            new THREE.BoxBufferGeometry(0.045, 0.345, 0.045),
+            new THREE.BoxGeometry(0.045, 0.345, 0.045),
             legMaterial
         );
         leg.position.set(x, 0.1725, z);
@@ -302,7 +301,7 @@ function createKotatsuLogo(model) {
     table.add(tabletopOutline);
 
     var text = new THREE.Mesh(
-        new THREE.PlaneBufferGeometry(0.62, 0.1),
+        new THREE.PlaneGeometry(0.62, 0.1),
         new THREE.MeshBasicMaterial({
             map: createTrackedTextTexture('KOTATSU'),
             transparent: true,
@@ -448,7 +447,7 @@ function createXLogoMesh(sourceMesh) {
     xShape.holes.push(xHole);
 
     var logoDepth = Math.max(size.z * 1.05, 0.075);
-    var logoGeometry = new THREE.ExtrudeBufferGeometry(xShape, {
+    var logoGeometry = new THREE.ExtrudeGeometry(xShape, {
         depth: logoDepth,
         bevelEnabled: true,
         bevelThickness: logoDepth * 0.12,
@@ -671,182 +670,155 @@ function getClickableName(object, root) {
 
     return null;
 }
+var disposeScene;
+
+function disposeGraph(root) {
+    var geometries = new Set();
+    var materials = new Set();
+    var textures = new Set();
+    root.traverse(function (object) {
+        if (object.geometry) geometries.add(object.geometry);
+        var list = Array.isArray(object.material) ? object.material : [object.material];
+        list.forEach(function (material) {
+            if (!material) return;
+            materials.add(material);
+            Object.values(material).forEach(function (value) { if (value && value.isTexture) textures.add(value); });
+        });
+    });
+    geometries.forEach(function (geometry) { geometry.dispose(); });
+    materials.forEach(function (material) { material.dispose(); });
+    textures.forEach(function (texture) { texture.dispose(); });
+}
+
 window.appJsFunctions = {
-
     cleanup: function () {
-        stopAnimation = true;
-
-        // invoking an event which has references to disposed object(s) looks start GC process.
-        if (resizeHandler) {
-            // not calling directly but using setTimeout ensures object(s) disposed.
-            window.setTimeout(resizeHandler);
-        }
+        if (disposeScene) { disposeScene(); disposeScene = null; }
     },
 
     loadScene: function () {
-
+        window.appJsFunctions.cleanup();
         var container = document.getElementById('index-3d-viewer');
-        if (!container) {
-            console.log('no container element found.');
-            return;
-        }
-
-        var viewerWidth = container.clientWidth;
-        var viewerHeight = container.clientHeight;
-
+        if (!container) return;
+        var disposed = false;
+        var animationId;
         var renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(viewerWidth, viewerHeight);
-        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
         container.appendChild(renderer.domElement);
 
-        var camera = new THREE.PerspectiveCamera(40, viewerWidth / viewerHeight, 0.1, 100);
-        camera.position.set(1, 1, -5.2);
-
-        if (viewerWidth < viewerHeight) {
-            camera.position.set(1, 1, -13.5);
-        }
-
-        var controls = new OrbitControls(camera, container);
-        controls.target.set(0, 0.5, 0);
-        controls.update();
-
+        var camera = new THREE.PerspectiveCamera(container.clientWidth < 600 ? 52 : 40,
+            container.clientWidth / container.clientHeight, 0.1, 120);
+        var navigation = createSceneNavigation(container, renderer.domElement, camera);
         var environment = new RoomEnvironment();
         var pmremGenerator = new THREE.PMREMGenerator(renderer);
-
         var scene = new THREE.Scene();
         scene.background = new THREE.Color(0xd9f4ff);
         scene.environment = pmremGenerator.fromScene(environment).texture;
-        scene.fog = new THREE.Fog(0xd9f4ff, 14, 55);
+        scene.fog = new THREE.Fog(0xd9f4ff, 42, 72);
+        environment.dispose();
+        pmremGenerator.dispose();
         addPastureEnvironment(scene);
 
         var model;
         var twitterRebrandTransition;
-
+        var loadError;
         var loader = new THREE.ObjectLoader();
-        loader.load("/3d/model.json", function (object) {
+        loader.load('/3d/model.json', function (object) {
+            if (disposed) { disposeGraph(object); return; }
             model = object;
             model.add(createKotatsuLogo(model));
+            addPublicSiteLogos(model);
             scene.add(model);
             twitterRebrandTransition = createTwitterRebrandTransition(model);
+        }, undefined, function () {
+            if (disposed) return;
+            loadError = document.createElement('p');
+            loadError.className = 'scene-help';
+            loadError.setAttribute('role', 'alert');
+            loadError.textContent = '3Dモデルを読み込めませんでした。ページを再読み込みしてください。';
+            container.appendChild(loadError);
         });
 
+        var destinations = {
+            X: { title: 'X', url: 'https://x.com/with_bugs' },
+            Twitter: { title: 'Twitter', url: 'https://twitter.com/with_bugs' },
+            YouTube: { title: 'YouTube', url: 'https://www.youtube.com/channel/UCJZeq1xYxpLn_SlOUnQ8XOA' },
+            Instagram: { title: 'Instagram', url: 'https://www.instagram.com/withbugs/' },
+            Kotatsu: { title: 'KOTATSU', url: 'https://withbugs.github.io/kotatsu/' },
+            GitHub: { title: 'GitHub', url: 'https://github.com/withbugs' }
+        };
+        PUBLIC_SITES.forEach(function (site) { destinations[site.name] = site; });
         var mouse = new THREE.Vector2();
-
-        var handler = function (e) {
-            var element = e.currentTarget;
-            var x = e.clientX - element.offsetLeft;
-            var y = e.clientY - element.offsetTop;
-            var w = element.offsetWidth;
-            var h = element.offsetHeight;
-
-            // for touch event
-            if (!x) {
-                var touch = e.changedTouches[0];
-                x = touch.clientX - element.offsetLeft;
-                y = touch.clientY - element.offsetTop;
-            }
-
-            // regularization from -1 to 1
-            mouse.x = (x / w) * 2 - 1;
-            mouse.y = -(y / h) * 2 + 1;
-
-            var raycaster = new THREE.Raycaster();
+        var raycaster = new THREE.Raycaster();
+        function pick(event) {
+            if (!model) return null;
+            var bounds = renderer.domElement.getBoundingClientRect();
+            mouse.set((event.clientX - bounds.left) / bounds.width * 2 - 1,
+                -(event.clientY - bounds.top) / bounds.height * 2 + 1);
             raycaster.setFromCamera(mouse, camera);
-
-            if (!model) {
-                return;
-            }
-
             var intersects = raycaster.intersectObjects(model.children, true);
-            if (intersects.length > 0) {
-                //console.log(intersects);
-                //console.log(intersects[0].object.name);
-
-                var url;
-                var objectName;
-                for (var i = 0; i < intersects.length; i++) {
-                    if (intersects[i].object.type !== 'Mesh') {
-                        continue;
-                    }
-
-                    objectName = getClickableName(intersects[i].object, model);
-                    if (objectName) {
-                        break;
-                    }
+            for (var index = 0; index < intersects.length; index++) {
+                var object = intersects[index].object;
+                if (!object.isMesh) continue;
+                var ancestor = object;
+                var visible = true;
+                while (ancestor) {
+                    if (!ancestor.visible) { visible = false; break; }
+                    ancestor = ancestor.parent;
                 }
-                switch (objectName) {
-                    case 'X':
-                        url = 'https://x.com/with_bugs';
-                        break;
-                    case 'Twitter':
-                        url = 'https://twitter.com/with_bugs';
-                        break;
-                    case 'YouTube':
-                        url = 'https://www.youtube.com/channel/UCJZeq1xYxpLn_SlOUnQ8XOA';
-                        break;
-                    case 'Instagram':
-                        url = 'https://www.instagram.com/withbugs/';
-                        break;
-                    case 'Kotatsu':
-                        url = 'https://withbugs.github.io/kotatsu/';
-                        break;
-                    case 'GitHub':
-                        url = 'https://github.com/withbugs';
-                        break;
-                    case 'Bot':
-                        url = 'http://withbugsbot.azurewebsites.net/';
-                        break;
-                }
-
-                if (url) {
-                    window.open(url);
-                }
+                if (!visible) continue;
+                var name = getClickableName(object, model);
+                if (destinations[name]) return destinations[name];
             }
+            return null;
         }
 
-        container.addEventListener('click', handler);
-        container.addEventListener('touchend', handler);
-        
-        stopAnimation = false;
+        function openLink(event) {
+            if (event.button !== 0 || !navigation.canOpenLink()) return;
+            var destination = pick(event);
+            if (destination) window.open(destination.url, '_blank', 'noopener,noreferrer');
+            else navigation.moveToGround(event);
+        }
+        function showHover(event) {
+            var destination = pick(event);
+            renderer.domElement.style.cursor = navigation.isDragging() ? 'grabbing' : destination ? 'pointer' : 'grab';
+            renderer.domElement.title = destination ? destination.title : '';
+        }
+        renderer.domElement.addEventListener('click', openLink);
+        renderer.domElement.addEventListener('pointermove', showHover);
 
-        var animate = function () {
-            if (stopAnimation) {
-                console.log('stopping animation');
-                return;
-            }
-
-            requestAnimationFrame(animate);
+        function resize() {
+            if (disposed || !container.clientWidth || !container.clientHeight) return;
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.fov = container.clientWidth < 600 ? 52 : 40;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            navigation.resize();
+        }
+        var observer = new ResizeObserver(resize);
+        observer.observe(container);
+        function animate(now) {
+            if (disposed) return;
+            animationId = requestAnimationFrame(animate);
+            navigation.update(now);
             updateTwitterRebrandTransition(twitterRebrandTransition);
             renderer.render(scene, camera);
+        }
+        animationId = requestAnimationFrame(animate);
+        disposeScene = function () {
+            if (disposed) return;
+            disposed = true;
+            cancelAnimationFrame(animationId);
+            observer.disconnect();
+            renderer.domElement.removeEventListener('click', openLink);
+            renderer.domElement.removeEventListener('pointermove', showHover);
+            navigation.dispose();
+            disposeGraph(scene);
+            if (scene.environment) scene.environment.dispose();
+            renderer.dispose();
+            renderer.domElement.remove();
+            if (loadError) loadError.remove();
         };
-
-        // resize event handler is added each time 'loadScene' function is called.
-        // to avoid keep adding handlers, remove a handler when referencing disposed object like 'container.clientWidth'.
-        // and have a handler reference as 'resizeHandler' to call in cleanup function to remove a handler and kick GC process.
-        var f;
-
-        window.addEventListener('resize', f = () => {
-
-            //console.log('resized');
-
-            var newWidth = container.clientWidth;
-            var newHeight = container.clientHeight;
-
-            camera.aspect = newWidth / newHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(newWidth, newHeight);
-
-            //console.log(newWidth);
-            if (newWidth == 0) {
-                window.removeEventListener('resize', f);
-                console.log('event removed');
-                return;
-            }
-        });
-
-        resizeHandler = f;
-
-        animate();
     }
 };
