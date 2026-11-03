@@ -65,9 +65,9 @@ export function createSceneNavigation(container, canvas, camera) {
         var halfFov = THREE.MathUtils.degToRad(camera.fov / 2);
         // Keep the frontal review angle and fit the front logos to the width. The rear
         // row remains behind them, so narrow screens can start closer.
-        var distance = Math.max(3.5, 2.6 / (Math.tan(halfFov) * camera.aspect));
+        var distance = Math.max(4.2, 2.6 / (Math.tan(halfFov) * camera.aspect));
         camera.position.set(0, distance * 0.54, -distance);
-        camera.lookAt(0, 0.4, -0.1);
+        camera.lookAt(0, 0.34, -0.1);
         camera.rotation.order = 'YXZ';
         camera.getWorldDirection(forward);
         yaw = Math.atan2(-forward.x, -forward.z);

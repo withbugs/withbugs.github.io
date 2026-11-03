@@ -3,7 +3,7 @@
 Published With Bugs website: https://withbugs.github.io/
 
 The development source is maintained in [WithBugs.WebSite](https://github.com/withbugs/WithBugs.WebSite).
-This release was generated from [the development commit](https://github.com/withbugs/WithBugs.WebSite/commit/6c09dc8eb59ba448425f5ed19a5828c030dea335).
+This release was generated from [the development commit](https://github.com/withbugs/WithBugs.WebSite/commit/07012ad869c98955a5bcc082c73b2bdaf5e0fcb8).
 
 The static files use Blazor WebAssembly / .NET 10 LTS and Three.js 0.186.1.
 GitHub Pages publishes the root of the master branch after a push.

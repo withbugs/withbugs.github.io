@@ -1,4 +1,4 @@
-﻿
+
 :root {
     --wb-bgcolor1: #f7f7f7;
     --wb-bgcolor2: #2a2a2a;
@@ -166,3 +166,90 @@ footer {
 .scene-instructions-panel dt { margin: 0; font-weight: 600; line-height: 1.5; }
 .scene-instructions-panel dd { margin: 0; line-height: 1.5; }
 .scene-instructions-panel p { margin: 16px 0 0; font-size: .75rem; line-height: 1.6; }
+
+
+/* Sculpture garden: the home scene fills the screen; content pages keep their layout. */
+body:has(#index-3d-viewer) {
+    overflow: hidden;
+    background: #d8e2d2;
+}
+body:has(#index-3d-viewer) main {
+    padding: 0;
+    min-height: 100dvh;
+}
+body:has(#index-3d-viewer) #index-3d-viewer {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+}
+body:has(#index-3d-viewer) header {
+    display: none;
+}
+body:has(#index-3d-viewer) footer {
+    bottom: calc(23px + env(safe-area-inset-bottom));
+    left: 32px;
+    width: auto;
+    height: auto;
+    padding: 0;
+    transform: none;
+    background: transparent;
+    color: #f5f5e9;
+    font-size: 11px;
+    letter-spacing: .04em;
+    text-shadow: 0 1px 8px rgba(27,46,31,.65);
+}
+body:has(#index-3d-viewer) footer a {
+    color: inherit;
+    padding: 8px 0 8px 8px;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+body:has(#index-3d-viewer) footer a:focus-visible {
+    outline: 2px solid #f2e4a8;
+    outline-offset: 5px;
+    border-radius: 3px;
+}
+body:has(#index-3d-viewer) .scene-instructions {
+    right: 30px;
+    bottom: calc(24px + env(safe-area-inset-bottom));
+}
+body:has(#index-3d-viewer) .scene-instructions summary {
+    width: 36px;
+    height: 36px;
+    color: #263e32;
+    background: rgba(247,248,235,.76);
+    border: 1px solid rgba(255,255,246,.6);
+    box-shadow: 0 3px 16px rgba(32,55,35,.07);
+    font-size: 21px;
+    backdrop-filter: blur(10px);
+}
+.scene-logo-label {
+    position: absolute;
+    z-index: 2;
+    transform: translate(-50%, -100%);
+    max-width: min(300px, calc(100% - 24px));
+    box-sizing: border-box;
+    pointer-events: none;
+    padding: 9px 14px;
+    border: 1px solid rgba(255,255,247,.7);
+    border-radius: 8px;
+    background: rgba(247,248,236,.9);
+    color: #243e31;
+    box-shadow: 0 4px 24px rgba(23,47,28,.09);
+    font-size: 12px;
+    line-height: 1.4;
+    letter-spacing: .025em;
+    backdrop-filter: blur(12px);
+}
+.scene-logo-label[hidden] { display: none; }
+@media (max-width: 600px) {
+    body:has(#index-3d-viewer) footer {
+        left: 20px;
+        bottom: calc(18px + env(safe-area-inset-bottom));
+        font-size: 10px;
+    }
+    body:has(#index-3d-viewer) .scene-instructions {
+        right: 20px;
+        bottom: calc(19px + env(safe-area-inset-bottom));
+    }
+}
